@@ -3,4 +3,3 @@ numpy
 scikit-image
 scikit-learn
 scipy
-tensorflow
