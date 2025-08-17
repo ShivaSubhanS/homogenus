@@ -20,7 +20,7 @@
 
 from setuptools import setup, find_packages
 
-with open('requirements.txt') as f:requirements = f.read().splitlines(),
+with open('requirements.txt') as f:requirements = f.read().splitlines()
 
 setup(name='homogenus',
       version='0.5.0',
