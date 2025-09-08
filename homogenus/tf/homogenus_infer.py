@@ -21,6 +21,10 @@
 import tensorflow as tf
 import numpy as np
 import os, glob
+import sys
+
+# Add homogenus directory to sys.path to locate homogenus.tools
+sys.path.append('/home/repos/homogenus/homogenus')
 
 class Homogenus_infer(object):
 
