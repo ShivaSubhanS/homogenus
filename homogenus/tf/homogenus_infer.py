@@ -34,31 +34,19 @@ class Homogenus_infer(object):
         else:
             raise ValueError('Could not find TF trained model in the provided directory --trained_model_dir=%s. Make sure you have downloaded them there.' % trained_model_dir)
 
-        # Load the model using TensorFlow 2.x
+        # Use TensorFlow 2.x compatibility mode to load checkpoint
         print('Loading checkpoint %s..' % self.best_model_fname)
-        # Assume the checkpoint is compatible with Keras or SavedModel
-        # If the model is a SavedModel, use tf.saved_model.load; if Keras, use tf.keras.models.load_model
-        # Here, we assume a checkpoint; adjust if it's a SavedModel or .h5
-        self.model = self.load_model()
-        self.input_tensor_name = 'input_images:0'
-        self.output_tensor_name = 'probs_op:0'
-
-    def load_model(self):
-        # In TensorFlow 2.x, we use tf.train.Checkpoint or Keras to load checkpoints
-        # Since the original uses import_meta_graph, we'll try to reconstruct the model
-        # If the model is a SavedModel or .h5, replace this with tf.saved_model.load or tf.keras.models.load_model
-        try:
-            # Attempt to load as a Keras model from checkpoint
-            model = tf.keras.models.load_model(self.best_model_fname)
-        except:
-            # Fallback: Load graph definition and restore weights
-            # Import the graph definition
-            imported = tf.saved_model.load(self.best_model_fname)
-            model = imported.signatures['serving_default']
-        return model
+        tf.compat.v1.disable_eager_execution()  # Disable eager execution for TF1.x compatibility
+        self.graph = tf.compat.v1.get_default_graph()
+        self.sess = tf.compat.v1.Session()
+        self.saver = tf.compat.v1.train.import_meta_graph(self.best_model_fname + '.meta')
+        self.prepare()
+        self.input_tensor = self.graph.get_tensor_by_name('input_images:0')
+        self.output_tensor = self.graph.get_tensor_by_name('probs_op:0')
 
     def prepare(self):
-        # No need for prepare in TensorFlow 2.x; model is ready after loading
+        # Restore the checkpoint weights
+        self.saver.restore(self.sess, self.best_model_fname)
         print('Model loaded and ready for inference.')
 
     def predict_genders(self, images_indir, openpose_indir, images_outdir=None, openpose_outdir=None):
@@ -124,12 +112,8 @@ class Homogenus_infer(object):
 
                 img = read_prep_image(cropped_image)[np.newaxis]
 
-                # TensorFlow 2.x inference
-                if isinstance(self.model, tf.keras.Model):
-                    probs_ob = self.model(img, training=False).numpy()[0]
-                else:
-                    # Assume SavedModel with serving_default signature
-                    probs_ob = self.model(img)[self.output_tensor_name].numpy()[0]
+                # TensorFlow 1.x-style inference using compatibility mode
+                probs_ob = self.sess.run(self.output_tensor, feed_dict={self.input_tensor: img})[0]
 
                 gender_id = np.argmax(probs_ob, axis=0)
                 gender_prob = probs_ob[gender_id]
