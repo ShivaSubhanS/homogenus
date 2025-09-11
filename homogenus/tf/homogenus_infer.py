@@ -82,7 +82,6 @@ class Homogenus_infer(object):
         else:
             raise ValueError('No images could be found in %s' % images_indir)
 
-        accept_threshold = 0.9
         crop_margin = 0.08
 
         if images_outdir is not None:
@@ -103,8 +102,6 @@ class Homogenus_infer(object):
 
             im_orig = cv2.imread(im_fname, 3)[:, :, ::-1].copy()
             for opnpose_pIdx in range(len(pose_data['people'])):
-                pose_data['people'][opnpose_pIdx]['gender_pd'] = 'neutral'
-
                 pose = np.asarray(pose_data['people'][opnpose_pIdx]['pose_keypoints_2d']).reshape(-1, 3)
                 if not should_accept_pose(pose, human_prob_thr=0.5):
                     continue
@@ -123,13 +120,8 @@ class Homogenus_infer(object):
                 gender_prob = probs_ob[gender_id]
                 gender_pd = 'male' if gender_id == 0 else 'female'
 
-                # Use threshold only for visualization, not for gender_pd
-                if gender_prob > accept_threshold:
-                    color = 'green'
-                    text = 'pred:%s[%.3f]' % (gender_pd, gender_prob)
-                else:
-                    text = 'thr:neutral_pred:%s[%.3f]' % (gender_pd, gender_prob)
-                    color = 'grey'
+                color = 'green'
+                text = 'pred:%s[%.3f]' % (gender_pd, gender_prob)
 
                 x1 = crop_info['crop_boundary']['offset_width']
                 y1 = crop_info['crop_boundary']['offset_height']
