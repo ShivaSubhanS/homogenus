@@ -123,12 +123,12 @@ class Homogenus_infer(object):
                 gender_prob = probs_ob[gender_id]
                 gender_pd = 'male' if gender_id == 0 else 'female'
 
+                # Use threshold only for visualization, not for gender_pd
                 if gender_prob > accept_threshold:
                     color = 'green'
                     text = 'pred:%s[%.3f]' % (gender_pd, gender_prob)
                 else:
-                    text = 'thr:%s_pred:%s[%.3f]' % ('neutral', gender_pd, gender_prob)
-                    gender_pd = 'neutral'
+                    text = 'thr:neutral_pred:%s[%.3f]' % (gender_pd, gender_prob)
                     color = 'grey'
 
                 x1 = crop_info['crop_boundary']['offset_width']
