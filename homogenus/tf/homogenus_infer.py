@@ -24,7 +24,7 @@ import os, glob
 import sys
 
 # Add homogenus directory to sys.path to locate homogenus.tools
-sys.path.append('/home/repos/homogenus/homogenus')
+sys.path.append('/home/repos/homogenus')
 
 class Homogenus_infer(object):
 
