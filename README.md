@@ -21,8 +21,8 @@ A pdf preprint is also available on the [project page](https://smpl-x.is.tue.mpg
 
 ## Installation
 **Requirements**
-- Python 3.7
-- [TensorFlow 1.13.1](https://www.tensorflow.org/install/pip)
+- Python 3.10
+- > [TensorFlow 2.*](https://www.tensorflow.org/install/pip)
 - [Configer](https://github.com/nghorbani/configer)
 
 Tested with CUDA-10.0 and cuDNN-7.5 running on Ubuntu 18.04.
