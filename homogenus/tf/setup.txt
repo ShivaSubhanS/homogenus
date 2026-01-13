@@ -1,0 +1,4 @@
+CUDA_VISIBLE_DEVICES="" python homogenus/tf/homogenus_infer.py \
+    -vf ../AlphaPose/girldance.mp4 \
+    -oi ../AlphaPose/results_video/ \
+    -pf alphapose

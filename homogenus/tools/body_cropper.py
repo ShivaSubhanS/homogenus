@@ -27,16 +27,52 @@ from homogenus.tools.image_tools import cropout_openpose
 
 def should_accept_pose(pose, human_prob_thr=.5):
     '''
+    Validate OpenPose keypoints (25 keypoints, BODY_25 format)
 
-    :param pose:
-    :param human_prob_thr:
-    :return:
+    :param pose: Nx3 array of keypoints [x, y, confidence]
+    :param human_prob_thr: threshold for average confidence
+    :return: True if pose is valid, False otherwise
     '''
     rleg_ids = [12,13]
     lleg_ids = [9,10]
     rarm_ids = [5,6,7]
     larm_ids = [2,3,4]
     head_ids = [16,15,14,17,0,1]
+
+    human_prob = pose[:, 2].mean()
+
+    rleg = sum(pose[rleg_ids][:, 2] > 0.0)
+    lleg = sum(pose[lleg_ids][:, 2] > 0.0)
+    rarm = sum(pose[rarm_ids][:, 2] > 0.0)
+    larm = sum(pose[larm_ids][:, 2] > 0.0)
+    head = sum(pose[head_ids][:, 2] > 0.0)
+
+    if rleg<1 and lleg<1: return False
+    if rarm<1 and larm<1: return False
+    if head<2: return False
+
+    if human_prob < human_prob_thr: return False
+    return True
+
+def should_accept_pose_alphapose(pose, human_prob_thr=.5):
+    '''
+    Validate AlphaPose keypoints (17 keypoints, COCO format)
+    COCO keypoint indices:
+    0: nose, 1-2: eyes, 3-4: ears, 5-6: shoulders, 7-8: elbows, 9-10: wrists,
+    11-12: hips, 13-14: knees, 15-16: ankles
+
+    :param pose: Nx3 array of keypoints [x, y, confidence]
+    :param human_prob_thr: threshold for average confidence
+    :return: True if pose is valid, False otherwise
+    '''
+    if len(pose) < 17:
+        return False
+        
+    rleg_ids = [13, 15]  # right knee, right ankle
+    lleg_ids = [14, 16]  # left knee, left ankle
+    rarm_ids = [6, 8, 10]  # right shoulder, right elbow, right wrist
+    larm_ids = [5, 7, 9]  # left shoulder, left elbow, left wrist
+    head_ids = [0, 1, 2, 3, 4]  # nose, eyes, ears
 
     human_prob = pose[:, 2].mean()
 
