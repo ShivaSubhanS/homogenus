@@ -175,6 +175,11 @@ class Homogenus_infer(object):
                 if pose_format == 'alphapose':
                     keypoints = people_data[opnpose_pIdx].get('keypoints', [])
                     pose = np.asarray(keypoints).reshape(-1, 3)
+                    
+                    # Handle Halpe 136 wholebody format - extract only first 26 body keypoints
+                    if len(pose) == 136:
+                        pose = pose[:26, :]
+                    
                     # Use AlphaPose-specific validation
                     if not should_accept_pose_alphapose(pose, human_prob_thr=0.5):
                         continue
